@@ -28,12 +28,12 @@ def toFile(u,v,psi,omega,f):
 def main():
 	N=10
 	M=10
-	EPS = 0.0001
-	RE = 600#reinolds
+	EPS = 0.001
+	RE = 400#reinolds
 	T = 10#maybe second
 	f = open("data.dat","w")
 	GAPS = 100#gaps on time
-	tau = 0.01;
+	tau = T / GAPS;
 	u = np.zeros((N,M))
 	hx = 1.0/(u.shape[0])
 	hy = 1.0/(u.shape[1])
@@ -54,20 +54,19 @@ def main():
 			#~ if i == 1:
 				#~ print(omega[i])
 			#sweep = Sweep(-u[i]/(2*hx) - 1.0/(RE*hx*hx),u[i:]/(2*hx) - 1.0/(RE*hx*hx),c,((2.0/tau)*omega[i:] - v[i:-1]*d(omega[i])  + (1.0/RE)*d2(omega[i])))
-			sweep = Sweep(-u[i]/(2*hx) - 1.0/(RE*hx*hx),u[i:]/(2*hx) - 1.0/(RE*hx*hx),c,((2.0/tau)*omega[i:] - v[i:-1]*d(omega[i])  + (1.0/RE)*d2(omega[i])))
+			sweep = Sweep(-u[i,1:-1]/(2*hx) - 1.0/(RE*hx*hx),u[i,1:-1]/(2*hx) - 1.0/(RE*hx*hx),c,((2.0/tau)*omega[i,1:-1] - v[i,1:-1]*d(omega[i,1:-1])  + (1.0/RE)*d2(omega[i,1:-1])))
 			omega[i] = sweep.solve(omega[i][0],omega[i][-1])
 		print("Start Sweep ony")
 		for i in range(1, N - 1):
-			sweep = Sweep(-v[:,i]/(2*hy) - 1.0/(RE*hy*hy),v[:,i]/(2*hy) - 1.0/(RE*hy*hy),c,((2.0/tau)*omega[:,i] - u[:,i]*d(omega[:,i])  +(1.0/RE)*d2(omega[:,i])))
+			sweep = Sweep(-v[1:-1,i]/(2*hy) - 1.0/(RE*hy*hy),v[1:-1,i]/(2*hy) - 1.0/(RE*hy*hy),c,((2.0/tau)*omega[1:-1,i] - u[1:-1,i]*d(omega[1:-1,i])  +(1.0/RE)*d2(omega[1:-1,i])))
 			omega[:,i] = sweep.solve(omega[0][i],omega[-1][i])
 		print("Start puasson")
 		
 		tp = TaskPuasson(A,psi,-1*omega)
 		#~ print(omega,u)
 		psi = tp.solve(EPS)
-		v = dy(psi,u)
-		#~ print(v)
-		u = -1*dx(psi,v)
+		v = -1*dx(psi,v)
+		u = dy(psi,u)
 		omega[0],omega[N - 1],omega[:,N-1],omega[:,0] = (2*(psi[0] - psi[1] + hx*u[0])/(hx*hx),				#down
 															 2*(psi[N-2] - psi[N-1] + hx*u[N-1])/(hx*hx),	#up
 															 2*(psi[:,N-2] - psi[:,N-1] + hy*v[:,N-1])/(hy*hy),		#left

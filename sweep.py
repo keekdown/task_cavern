@@ -25,4 +25,4 @@ class Sweep:
 			#print(self._u)
 			self._u[i] = self._alpha[i] * self._u[i+1] + self._betta[i]
 		self._u[0] = bound0
-		return self._u.copy()[1:-1]
+		return self._u.copy()
