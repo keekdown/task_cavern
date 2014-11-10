@@ -32,9 +32,9 @@ class TaskPuasson:
 		return self._u.copy()
 		
 	def calc(self,tau,r):
-		for i in range(1, self._u.shape[0] - 1):
-			for j in range(1, self._u.shape[1] - 1):
-				self._newU[i,j] = self._u[i,j] - tau*r[i,j]
+		for j in range(1, self._u.shape[0] - 1):
+			for i in range(1, self._u.shape[1] - 1):
+				self._newU[j,i] = self._u[j,i] - tau*r[j,i]
 		self._u = self._newU.copy()
 				
 	def cutBounds(self,u):

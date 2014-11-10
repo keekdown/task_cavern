@@ -8,9 +8,9 @@ def A(u):
 	new_u = u.copy()
 	hx = 1.0/(u[0].size ** 2)
 	hy = 1.0/float(u[0:u[0].size,0:1].size ** 2)
-	for i in range(1, u.shape[0] - 1):
-		for j in range(1, u.shape[1] - 1):
-			new_u[i,j] = ((u[i+1,j] - 2*u[i,j] + u[i-1,j])/hx + (u[i,j+1] - 2*u[i,j] + u[i,j-1])/hy)
+	for j in range(1, u.shape[0] - 1):
+		for i in range(1, u.shape[1] - 1):
+			new_u[j,i] = ((u[j,i + 1] - 2*u[j,i] + u[j,i - 1])/hx + (u[j + 1,i] - 2*u[j,i] + u[j - 1,i])/hy)
 	return new_u
 
 def toFile(u,v,psi,omega,f):
@@ -51,15 +51,12 @@ def main():
 	for gap in range(0, GAPS):
 		print("Start Sweep onx")
 		for i in range(1, N - 1):
-			#~ if i == 1:
-				#~ print(omega[i])
-			#sweep = Sweep(-u[i]/(2*hx) - 1.0/(RE*hx*hx),u[i:]/(2*hx) - 1.0/(RE*hx*hx),c,((2.0/tau)*omega[i:] - v[i:-1]*d(omega[i])  + (1.0/RE)*d2(omega[i])))
-			sweep = Sweep(-u[i,1:-1]/(2*hx) - 1.0/(RE*hx*hx),u[i,1:-1]/(2*hx) - 1.0/(RE*hx*hx),c,((2.0/tau)*omega[i,1:-1] - v[i,1:-1]*d(omega[i,1:-1])  + (1.0/RE)*d2(omega[i,1:-1])))
-			omega[i] = sweep.solve(omega[i][0],omega[i][-1])
+			sweep = Sweep(-u[1:-1,i]/(2*hx) - 1.0/(RE*hx*hx),u[1:-1,i]/(2*hx) - 1.0/(RE*hx*hx),c,((2.0/tau)*omega[1:-1,i] - v[1:-1,i]*d(omega[1:-1,i])  + (1.0/RE)*d2(omega[1:-1,i])))
+			omega[i] = sweep.solve(omega[0][i],omega[-1][i])
 		print("Start Sweep ony")
 		for i in range(1, N - 1):
-			sweep = Sweep(-v[1:-1,i]/(2*hy) - 1.0/(RE*hy*hy),v[1:-1,i]/(2*hy) - 1.0/(RE*hy*hy),c,((2.0/tau)*omega[1:-1,i] - u[1:-1,i]*d(omega[1:-1,i])  +(1.0/RE)*d2(omega[1:-1,i])))
-			omega[:,i] = sweep.solve(omega[0][i],omega[-1][i])
+			sweep = Sweep(-v[i,1:-1]/(2*hy) - 1.0/(RE*hy*hy),v[i,1:-1]/(2*hy) - 1.0/(RE*hy*hy),c,((2.0/tau)*omega[i,1:-1] - u[i,1:-1]*d(omega[i,1:-1])  +(1.0/RE)*d2(omega[i,1:-1])))
+			omega[:,i] = sweep.solve(omega[i][0],omega[i][-1])
 		print("Start puasson")
 		
 		tp = TaskPuasson(A,psi,-1*omega)
