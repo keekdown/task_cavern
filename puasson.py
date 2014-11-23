@@ -19,30 +19,12 @@ class TaskPuasson:
 		while(self._normu / self._normu0 > eps):
 			r = self._A(self._u) - (self._f)
 			r[0],r[N - 1],r[0:N,N-1:N],r[0:N,0:1] = (0,0,0,0)
-			tau = float((np.dot(self.cutBounds(self._A(r)).reshape(self._sizenew), self.cutBounds(r).reshape(self._sizenew)))) / \
-				  float((np.dot(self.cutBounds(self._A(r)).reshape(self._sizenew),self.cutBounds(self._A(r)).reshape(self._sizenew))))
+			_r = r[1:-1,1:-1]
+			Ar = self._A(r)[1:-1,1:-1]
+			a = float(np.dot(Ar.reshape(Ar.size),_r.reshape(_r.size)))
+			b = float(np.dot(Ar.reshape(Ar.size),Ar.reshape(Ar.size)))
+			tau =  a / b
 			count += 1
-			#~ r.shape = ((sizex,sizey))
-			#~ self._u = self._u - tau * r
-			self.calc(tau,r)
-			#print(count)
-			#~ if count % 100 == 0:
-				#~ print(self._u)
-			self._normu = LA.norm(self.cutBounds(r))
+			self._u[1:-1,1:-1] = self._u[1:-1,1:-1] - tau * r[1:-1,1:-1]
+			self._normu = LA.norm(r)
 		return self._u.copy()
-		
-	def calc(self,tau,r):
-		for j in range(1, self._u.shape[0] - 1):
-			for i in range(1, self._u.shape[1] - 1):
-				self._newU[j,i] = self._u[j,i] - tau*r[j,i]
-		self._u = self._newU.copy()
-				
-	def cutBounds(self,u):
-		new_u = u.copy()
-		new_u = new_u[1:]#cut up
-		new_u = new_u[0:,1:]#cut left
-		new_u = new_u[0:-1]#cut down
-		new_u = new_u[0:,0:-1]
-		self._sizenew = new_u.size
-		return new_u
-
