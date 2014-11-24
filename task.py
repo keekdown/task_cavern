@@ -22,19 +22,19 @@ def toFile(u,v,psi,omega,f):
 	#~ f=open("data.dat","a")
 	f.write("TITLE = Test\n")
 	f.write("VARIABLES = X,Y,U,V,Psi\n")
-	x = np.linspace(0,u.shape[0],u.shape[0])
-	y = np.linspace(0,u.shape[1],u.shape[1])
+	x = np.linspace(0,10,10)
+	y = np.linspace(0,10,10)
 	f.write("ZONE T=Test1,I=" + str(u.shape[0]) + ", J="+ str(u.shape[1]) + ", F=POINT"+"\n")
 	for i in range(0, u.shape[0]):
 		for j in range(0, u.shape[1]):
-			f.write(str(x[i])+" "+str(y[j])+" "+str(v[i][j])+" "+str(u[i][j])+" "+str(psi[i][j])+"\n")
+			f.write(str(x[i])+" "+str(y[j])+" "+str(u[i][j])+" "+str(v[i][j])+" "+str(psi[i][j])+"\n")
 			
 def main():
 	EPS = 0.0001
-	RE = 400#reinolds
+	RE = 100#reinolds
 	T = 10#maybe second
 	f = open("data.dat","w")
-	GAPS = 100#gaps on time
+	GAPS = 1000#gaps on time
 	tau = 0.001#T/GAPS#float(T / GAPS);
 	u = np.zeros((N,M))
 	hx = 1.0/(u.shape[0])
@@ -44,7 +44,7 @@ def main():
 	omega = u.copy()
 	u[N-1] = (np.arange(0,N,1)**4)
 	omega[0],omega[N - 1],omega[:,N-1],omega[:,0] = (2*(-psi[1])/(hx*hx),				#down
-									2*(-psi[N-2] + hx*u[N-1])/(hx*hx),	#up
+									2*(+psi[N-2] + hx*u[N-1])/(hx*hx),	#up
 									2*(-psi[:,N-2])/(hy*hy),		#left
 									2*(-psi[:,1])/(hy*hy))	#right
 	c = np.zeros(u.size)
@@ -68,10 +68,10 @@ def main():
 			v = -1*dx(psi,v)
 			u = dy(psi,u)
 			omega[0],omega[N - 1],omega[:,N-1],omega[:,0] = (2*(-psi[1])/(hx*hx),				#down
-									2*(-psi[N-2] + hx*u[N-1])/(hx*hx),	#up
+									2*(+psi[N-2] + hx*u[N-1])/(hx*hx),	#up
 									2*(-psi[:,N-2])/(hy*hy),		#left
 									2*(-psi[:,1])/(hy*hy))	#right
-			toFile(v,u,psi,omega,f)
+			toFile(u,v,psi,omega,f)
 	except RuntimeError:
 		print("BAAAD")
 		sys.exit()
