@@ -1,5 +1,6 @@
 import numpy as np
 from numpy import linalg as LA
+from params import *
 class TaskPuasson:
 	def __init__(self,A,u,f):
 		self._A = A
@@ -11,14 +12,12 @@ class TaskPuasson:
 		self._normu  = self._normu0
 		
 	def solve(self,eps):
-		sizex = self._u[0].size
-		sizey = self._u[0:(self._u[0].size),0:1].size
 		count = 0
 		r = np.zeros((self._u.shape[0],self._u.shape[1]))
 		N = self._u.shape[0]
 		while(self._normu / self._normu0 > eps):
 			r = self._A(self._u) - (self._f)
-			r[0],r[N - 1],r[0:N,N-1:N],r[0:N,0:1] = (0,0,0,0)
+			r[0],r[N - 1],r[:,-1],r[:,0] = (0,0,0,0)
 			_r = r[1:-1,1:-1]
 			Ar = self._A(r)[1:-1,1:-1]
 			a = float(np.dot(Ar.reshape(Ar.size),_r.reshape(_r.size)))

@@ -25,7 +25,10 @@ class Sweep:
 			#print(self._u)
 			self._u[i] = self._alpha[i] * self._u[i+1] + self._betta[i]
 		self._u[0] = bound0
-		return self._u.copy()
+		if bound0 == 0 and bound1 == 0:
+			return -1*((self._u.copy())[::-1])
+		else:
+			return (self._u.copy())
 
 def TDMA(a,b,c,f):
     #a, b, c, f = map(lambda k_list: map(float, k_list), (a, b, c, f))

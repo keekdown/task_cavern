@@ -1,0 +1,11 @@
+HIGHT = 1
+hx = 0.1
+hy = 0.1
+N  = int(HIGHT/hx)
+M  = int(HIGHT/hy)
+RE = 300
+t  = 0.01
+T  = 100
+USTART = 0.1
+EPS    = 0.0001
+approxUVbound =  True
