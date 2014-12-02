@@ -26,21 +26,33 @@ def toFile(u,v,psi,omega,f):
 			f.write(str(x[i])+" "+str(y[j])+" "+str(u[j][i])+" "+str(v[j][i])+" "+str(psi[j][i])+"\n")
 			
 def boundOmega(psi,u,v,omega):
-	omega[0]     = (2*psi[1] + hx*u[0])/(hx*hx)
+	omega[0]     = (2*psi[1]+ hx*u[0])/(hx*hx)
 	omega[N - 1] = (2*psi[N - 2] + hx*u[N - 1] )/(hx*hx)
-	omega[:,0]   = (2*psi[:,1])/(hy*hy)
-	omega[:,M-1] = (2*psi[:,M-2])/(hy*hy)
+	omega[:,0]   = (2*psi[:,1])/(hy*hy)#(dR(v.copy()[:,0]) - dx(u,u)[:,0])#
+	omega[:,M-1] = (2*psi[:,M-2])/(hy*hy)#dR(v.copy()[:,M-1]) -dx(u,u)[:,M-1]#
 			
+def boundPsiFull(psi):
+	psi[0] = 0
+	psi[:,0] = np.arange(0,HIGHT,hx)
+	psi[N-1,:] = psi[N-1,0]
+	psi[:,M-1] = np.arange(0,HIGHT,hx)
+	
+				
 def main():
 	files = open("data.dat","w")
 	u = np.zeros((N,M))
 	v = u.copy()
 	psi = u.copy()
 	omega = u.copy()
-	u[N - 1] = USTART
-	u[0]     = USTART
+	u[0]  = 0
+	u[N-1] = USTART_UP
+	u[:,0] = USTART_INPUT
+	u[:,-1] = USTART_OUTPUT
+	#u[0]     = 0
 	boundOmega(psi,u,v,omega)
-	#print(omega)
+	#boundPsiFull(psi)
+	#print(v)
+	#sys.exit()
 	for step in range(0,T):
 		print("Start sweep in x")
 		for row in range(0,N):
@@ -48,8 +60,8 @@ def main():
 			c = numpy.zeros(a.size)
 			c.fill((2.0/t - 2.0/(RE*hx*hx)))
 			b = u[row,1:-1]/(2*hx) - 1.0/(RE*hx*hx)
-			coef_f1 = (dy(omega))[row,1:-1]#(dC(omega[row,:]))
-			coef_f2 = (d2y(omega))[row,1:-1]#(d2(omega[row,:]))
+			coef_f1 = (dy(omega,omega))[row,1:-1]#(dC(omega[row,:]))[1:-1]##
+			coef_f2 = (d2y(omega))[row,1:-1]#(d2(omega[row,:]))[1:-1]#
 			f = (-omega[row,1:-1] * 2)/t + v[row,1:-1]*coef_f1 - (1.0/RE)*coef_f2
 			sweep = Sweep(a,b,-c,-f)
 			omega[row,:] = sweep.solve(omega[row,0],omega[row,M-1])
@@ -59,16 +71,19 @@ def main():
 			c = a.copy()
 			c.fill(2.0/t - 2.0/(RE*hy*hy))
 			b = v[1:-1,col]/(2*hy) - 1.0/(RE*hy*hy)
-			coef_f1 = (dx(omega))[1:-1,col]#(dC(omega[:,col]))
-			coef_f2 = (d2x(omega))[1:-1,col]#((d2(omega[:,col])))
+			coef_f1 = (dx(omega,omega))[1:-1,col]#(dC(omega[:,col]))[1:-1]##
+			coef_f2 = (d2x(omega))[1:-1,col]#((d2(omega[:,col])))[1:-1]##
 			f = (-omega[1:-1,col] * 2)/t + u[1:-1,col]*coef_f1 - (1.0/RE)*coef_f2
 			sweep = Sweep(a,b,-c,-f)
 			omega[:,col] = sweep.solve(omega[0,col],omega[M-1,col])
 		puasson = TaskPuasson(A,psi,-omega)
 		print("Start puasson")
 		psi = puasson.solve(EPS)
-		v   = -1*dx(psi)
-		u   =  dy(psi)
+		v   = -1*dx(psi,v)
+		u   =  dy(psi,u)
+		#if step == 1:
+		#	print(u)
+		#	sys.exit()
 		boundOmega(psi,u,v,omega)
 		toFile(u,v,psi,omega,files)
 	files.close()
