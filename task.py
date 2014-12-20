@@ -28,8 +28,8 @@ def toFile(u,v,psi,omega,f):
 def boundOmega(psi,u,v,omega):
 	omega[0]     = (2*psi[1]+ hx*u[0])/(hx*hx)
 	omega[N - 1] = (2*psi[N - 2] + hx*u[N - 1] )/(hx*hx)
-	omega[:,0]   = (2*psi[:,1])/(hy*hy)#(dR(v.copy()[:,0]) - dx(u,u)[:,0])#
-	omega[:,M-1] = (2*psi[:,M-2])/(hy*hy)#dR(v.copy()[:,M-1]) -dx(u,u)[:,M-1]#
+	omega[:,0]   = (dR(v.copy()[:,0]) - dx(u,u)[:,0])#(2*psi[:,1])/(hy*hy)#(dR(v.copy()[:,0]) - dx(u,u)[:,0])#
+	omega[:,M-1] = dR(v.copy()[:,M-1]) -dx(u,u)[:,M-1]#(2*psi[:,M-2])/(hy*hy)#dR(v.copy()[:,M-1]) -dx(u,u)[:,M-1]#
 			
 def boundPsiFull(psi):
 	psi[0] = 0
@@ -39,7 +39,7 @@ def boundPsiFull(psi):
 	
 				
 def main():
-	files = open("data.dat","w")
+	files = open("data2.dat","w")
 	u = np.zeros((N,M))
 	v = u.copy()
 	psi = u.copy()
@@ -50,7 +50,7 @@ def main():
 	u[:,-1] = USTART_OUTPUT
 	#u[0]     = 0
 	boundOmega(psi,u,v,omega)
-	#boundPsiFull(psi)
+	boundPsiFull(psi)
 	#print(v)
 	#sys.exit()
 	for step in range(0,T):
