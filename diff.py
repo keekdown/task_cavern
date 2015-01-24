@@ -1,6 +1,6 @@
 import numpy
 from params import *
-def dx(u,out):
+def dx(u,out,hx,N,M):
 	new_u = out.copy()
 	for i in range(1, N - 1):
 		for j in range(1, M - 1):
@@ -10,7 +10,7 @@ def dx(u,out):
 		new_u[:,-1] = (-u[:,-2] + u[:,-1])/(hx)
 	return new_u
 
-def dy(u,out):
+def dy(u,out,hy,N,M):
 	new_u = out.copy()
 	for i in range(1, N - 1):
 		for j in range(1, M - 1):
@@ -20,7 +20,7 @@ def dy(u,out):
 		new_u[-1,:] = (-u[-2,:] + u[-1,:])/(hy)
 	return new_u
 	
-def dC(u):
+def dC(u,hx,N):
 	new_u = u.copy()#numpy.zeros(u.shape)
 	for i in range(1, N - 1):
 		new_u[i] = (u[i+1] - u[i - 1]) / (2*hx)
@@ -29,19 +29,19 @@ def dC(u):
 		new_u[-1] = (-u[-1] + u[-2])/(hx)
 	return new_u
 
-def dR(u):
+def dR(u,hx,N):
 	new_u = u.copy()#numpy.zeros(u.shape)
 	for i in range(0, N - 1):
 		new_u[i] = (u[i+1] - u[i]) / (hx)
 	return new_u
 	
-def dL(u):
+def dL(u,hx,N):
 	new_u = u.copy()#numpy.zeros(u.shape)
 	for i in range(1, N):
 		new_u[i] = (u[i] - u[i - 1]) / (hx)
 	return new_u	
 	
-def d2(u):
+def d2(u,hx,N):
 	new_u = u.copy()#numpy.zeros(u.shape)
 	for i in range(1, N - 1):
 		new_u[i] = (u[i+1] - 2* u[i] + u[i-1]) / (hx*hx)
@@ -50,7 +50,7 @@ def d2(u):
 		new_u[-1] = (u[-1] - u[-2])/(2*hx)
 	return new_u
 
-def d2x(u):
+def d2x(u,hx,N,M):
 	new_u = u.copy()#numpy.zeros(u.shape)
 	for i in range(1, N - 1):
 		for j in range(1, M - 1):
@@ -60,7 +60,7 @@ def d2x(u):
 		new_u[:,-1] = (-u[:,-2] + u[:,-1])/(hx)
 	return new_u
 	
-def d2y(u):
+def d2y(u,hy,N,M):
 	new_u = u.copy()#numpy.zeros(u.shape)
 	for i in range(1, N - 1):
 		for j in range(1, M - 1):
